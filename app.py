@@ -1,5 +1,4 @@
 import random
-import time
 import streamlit as st
 
 st.set_page_config(
@@ -47,17 +46,17 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-st.title("🏚️ GAME SPIRIT: HOUSE OF TABBY")
+st.title("HOUSE OF TABBY: SPIRIT GAME")
 
-# Kho ảnh Pixel Art Kinh dị (Minh họa phong cách House/Tabby)
-IMG_ROOM = "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=800"  # Phòng trực Pixel
-IMG_HALLWAY = "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=800"  # Hành lang sửa máy
-IMG_LOCKER = "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=800"  # Trong tủ tối om
-IMG_ENEMY = "https://images.unsplash.com/photo-1509248961158-e54f6934749c?q=80&w=800"  # Kẻ phản diện bóng đen
+# Kho ảnh Pixel Art Kinh dị
+IMG_ROOM = "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=800"
+IMG_HALLWAY = "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=800"
+IMG_LOCKER = "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=800"
+IMG_ENEMY = "https://images.unsplash.com/photo-1509248961158-e54f6934749c?q=80&w=800"
 
 # Khởi tạo dữ liệu Game
 if "location" not in st.session_state:
-    st.session_state.location = "room"  # room, hallway, locker
+    st.session_state.location = "room"
 if "generator_broken" not in st.session_state:
     st.session_state.generator_broken = False
 if "villain_near" not in st.session_state:
@@ -71,20 +70,16 @@ if "win" not in st.session_state:
 
 
 def trigger_event():
-    # Tăng thời gian
     st.session_state.time_survived += 1
 
-    # Ngẫu nhiên hỏng máy phát điện
     if random.random() < 0.4 and not st.session_state.generator_broken:
         st.session_state.generator_broken = True
 
-    # Ngẫu nhiên Kẻ phản diện xuất hiện
     if random.random() < 0.5:
         st.session_state.villain_near = True
     else:
         st.session_state.villain_near = False
 
-    # Thắng sau 8 lượt sống sót
     if st.session_state.time_survived >= 8:
         st.session_state.win = True
 
@@ -93,57 +88,118 @@ def trigger_event():
 if st.session_state.game_over:
     st.image(
         IMG_ENEMY,
-        caption="😱 KẺ PHẢN DIỆN ĐÃ TỚI... GAME OVER!",
+        caption="KE PHAN DIEN DA TOI... GAME OVER!",
         use_container_width=True,
     )
-    st.error("💀 Bạn đã bị phát hiện!")
-    if st.button("🔄 CHƠI LẠI"):
+    st.error("Ban da bi phát hien!")
+    if st.button("CHOI LAI"):
         st.session_state.clear()
         st.rerun()
 
 elif st.session_state.win:
     st.balloons()
-    st.success("🎉 CHIẾN THẮNG! BẠN ĐÃ SỐNG SÓT QUA ĐÊM TRONG CĂN NHÀ!")
-    if st.button("🔄 CHƠI LẠI"):
+    st.success("CHIEN THANG! BAN DA SONG SOT QUA DEM!")
+    if st.button("CHOI LAI"):
         st.session_state.clear()
         st.rerun()
 
 else:
     st.caption(
-        f"⏱️ Đã sống sót: {st.session_state.time_survived}/8 Lượt | 🕹️ Style: House/Tabby Pixel"
+        f"Luot song sot: {st.session_state.time_survived}/8 | Style: Tabby House Pixel"
     )
 
     # ĐỊA ĐIỂM: PHÒNG TRỰC
     if st.session_state.location == "room":
         st.image(
             IMG_ROOM,
-            caption="📺 Phòng An Toàn (Có Tủ Trốn 🗄️)",
+            caption="Phong An Toan (Co Tu Tron)",
             use_container_width=True,
         )
 
         if st.session_state.generator_broken:
             st.error(
-                "🚨 BÁO ĐỘNG: Máy phát điện hành lang bị hỏng! Mất điện toàn hệ thống!"
+                "BAO DONG: May phat dien hanh lang bi hong! Mat dien toan he thong!"
             )
         elif st.session_state.villain_near:
             st.warning(
-                "⚠️ CẢNH BÁO: Có tiếng bước chân nặng nề đang tiến gần phòng..."
+                "CANH BAO: Co tieng buoc chan nang ne dang tien gan phong..."
             )
         else:
-            st.info("Bầu không khí im lặng đến rợn người...")
+            st.info("Bau khong khi im lang den ron nguoi...")
 
         st.write("---")
         col1, col2, col3 = st.columns(3)
 
         with col1:
-            if st.button("🗄️ CHUI VÀO TỦ TRỐN"):
+            if st.button("CHUI VAO TU TRON"):
                 st.session_state.location = "locker"
                 st.rerun()
 
         with col2:
-            if st.button("🚶 RA HÀNH LANG KIỂM TRA"):
+            if st.button("RA HANH LANG KIEM TRA"):
                 st.session_state.location = "hallway"
                 st.rerun()
 
         with col3:
-            if st.button("👀 CHỜ VÀ QU
+            if st.button("CHO VA QUAN SAT"):
+                if st.session_state.villain_near:
+                    st.session_state.game_over = True
+                else:
+                    trigger_event()
+                st.rerun()
+
+    # ĐỊA ĐIỂM: TỦ TRỐN
+    elif st.session_state.location == "locker":
+        st.image(
+            IMG_LOCKER,
+            caption="Ban dang nin tho ben trong chiec tu go chat hep...",
+            use_container_width=True,
+        )
+
+        if st.session_state.villain_near:
+            st.error(
+                "Ke phan dien vua di ngang qua tu... Ban nghe thay tieng tho cua no!"
+            )
+        else:
+            st.write("Ben ngoai co ve da an toan.")
+
+        st.write("---")
+        if st.button("BUOC RA KHOI TU"):
+            st.session_state.location = "room"
+            st.session_state.villain_near = False
+            trigger_event()
+            st.rerun()
+
+    # ĐỊA ĐIỂM: HÀNH LANG KIỂM TRA SỰ CỐ
+    elif st.session_state.location == "hallway":
+        st.image(
+            IMG_HALLWAY,
+            caption="Hanh lang toi - Noi dat May phat dien",
+            use_container_width=True,
+        )
+
+        if st.session_state.villain_near:
+            st.error(
+                "BONG DEN PHAN DIEN XUAT HIEN TU CUOI HANH LANG! CHAY NGAY!"
+            )
+
+        st.write("---")
+        col_h1, col_h2 = st.columns(2)
+
+        with col_h1:
+            if st.session_state.generator_broken:
+                if st.button("SUA MAY PHAT DIEN"):
+                    if st.session_state.villain_near:
+                        st.session_state.game_over = True
+                    else:
+                        st.session_state.generator_broken = False
+                        st.success("Ban da sua xong may phat dien!")
+                        trigger_event()
+                    st.rerun()
+            else:
+                st.write("May phat dien dang hoat dong binh thuong.")
+
+        with col_h2:
+            if st.button("CHAY VE PHONG TRUC"):
+                st.session_state.location = "room"
+                st.rerun()
